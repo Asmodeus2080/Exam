@@ -11,7 +11,7 @@ const model = genAI.getGenerativeModel({ model: "gemini-pro"});
 async function getAnswer(question) {
     try {
         const prompt = `can you answer this question ${question} only provide the answer donot write the question again and try to answer this question with appropriate examples if possible`;
-        console.log(prompt);
+        // console.log(prompt);
         const result = await model.generateContent(prompt);
         const response = await result.response;
         // console.log(response);
@@ -28,6 +28,26 @@ async function getAnswer(question) {
     }
        
 }
+async function upvoteAnswer(data) {
+    try {
+        const result = await questionBankRepository.updateUpvote(data);
+        console.log(result);
+        return result;
+    } catch (error) {
+        throw new AppError("Something went wrong, while updating upvote", StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+}
+
+async function downvote(data) {
+    try {
+        const result = await questionBankRepository.updateDownVote(data);
+        return result;
+    } catch (error) {
+       throw new AppError("Something went wrong, while updating downvote", StatusCodes.INTERNAL_SERVER_ERROR); 
+    }
+}
 module.exports = {
     getAnswer,
+    upvoteAnswer,
+    downvote,
 }

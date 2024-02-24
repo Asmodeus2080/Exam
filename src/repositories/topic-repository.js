@@ -24,6 +24,16 @@ class TopicRepository extends CrudRepository {
             throw error;
         }
     }
+    async getTopicsByUserId(data) {
+        try {
+            const topics = await Topic.find({
+                userId : data.id,
+            });
+            return topics;
+        } catch (error) {
+            throw error;
+        }
+    }
 };
 
 module.exports = TopicRepository;
