@@ -1,48 +1,59 @@
-const { StatusCodes } = require('http-status-codes');
-const { errorResponse } = require('../utils/common');
-const AppError = require('../utils/errors/app-error');
+const { StatusCodes } = require("http-status-codes");
 
-function validateNote(req, res, next) {
-    if(!req.body.title || !req.body.content) {
-        errorResponse.message = 'something went wrong while validating note';
-        errorResponse.error = new AppError(
-         ['fields cannot be blank'], StatusCodes.BAD_REQUEST
-        );
-        return res.status(StatusCodes.BAD_REQUEST)
-                    .json(errorResponse);
-    }
-    if(req.body.title.length < 3 || req.body.content.length < 4) {
-        errorResponse.message = 'something went wrong while validating note';
-        errorResponse.error = new AppError(
-         ['title or content data is too low to create a note'], StatusCodes.BAD_REQUEST
-        );
-        return res.status(StatusCodes.BAD_REQUEST)
-                    .json(errorResponse);
-    }
-    next();
+const { errorResponse } = require("../utils/common");
+const AppError = require("../utils/errors/app-error");
+
+function validateAuthRequest(req, res, next) {
+  // console.log(req.body);
+  if (!req.body.email) {
+    errorResponse.message = "Something went wrong while authenticating user";
+    errorResponse.error = new AppError(
+      ["Email not found in the incoming request in the correct form"],
+      StatusCodes.BAD_REQUEST
+    );
+    return res.status(StatusCodes.BAD_REQUEST).json(errorResponse);
+  }
+  if (!req.body.password) {
+    errorResponse.message = "Something went wrong while authenticating user";
+    errorResponse.error = new AppError(
+      ["password not found in the incoming request in the correct form"],
+      StatusCodes.BAD_REQUEST
+    );
+    return res.status(StatusCodes.BAD_REQUEST).json(errorResponse);
+  }
+  next();
 }
 
-function validateNoteEdit(req, res, next) {
-    if(req.body.title && req.body.title.length < 3) {
-        errorResponse.message = 'something went wrong while editing note';
-        errorResponse.error = new AppError(
-         ['title length is very less'], StatusCodes.BAD_REQUEST
-        );
-        return res.status(StatusCodes.BAD_REQUEST)
-                    .json(errorResponse);
+async function checkAuth(req, res, next) {
+  try {
+    const response = await UserService.isAuthenticated(
+      req.headers["x-access-token"]
+    );
+    //  console.log('response of check auth', response);
+    if (response) {
+      req.user = response; // setting the user id in the req object
+      next();
     }
-    if(req.body.content && req.body.content.length < 4) {
-        errorResponse.message = 'something went wrong while editing note';
-        errorResponse.error = new AppError(
-         ['content data is too low to edit a note'], StatusCodes.BAD_REQUEST
-        );
-        return res.status(StatusCodes.BAD_REQUEST)
-                    .json(errorResponse);
+  } catch (error) {
+    return res.status(error.statusCode).json(error);
+  }
+}
+
+async function checkAuthReset(req, res, next) {
+  try {
+    const response = await UserService.isAuthenticatedReset(req.params.id, req.params.jwt);
+    // console.log('response of check auth', response);
+    if (response) {
+      req.user = response; // setting the user id in the req object
+      next();
     }
-    next();
+  } catch (error) {
+    return res.status(error.statusCode).json(error);
+  }
 }
 
 module.exports = {
-    validateNote,
-    validateNoteEdit
-}
+  validateAuthRequest,
+  checkAuth,
+  checkAuthReset,
+};
