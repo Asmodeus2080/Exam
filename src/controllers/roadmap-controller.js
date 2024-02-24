@@ -1,79 +1,15 @@
 const { StatusCodes } = require('http-status-codes');
-const {  } = require('../services');
+const { RoadmapService } = require('../services');
 const { successResponse, errorResponse } = require('../utils/common');
 
-async function createNote(req, res) {
+async function getRoadmap(req, res) {
     try {
-        const note = await NoteService.createNote(req.body);
-        successResponse.data = note;
+        const roadmap = await RoadmapService.getRoadmap(req.params.id);
+        successResponse.data = roadmap;
         return res.status(StatusCodes.CREATED)
                     .json(successResponse);
     } catch (error) {
-        errorResponse.error = error;
-        return res.status(error.statusCode)
-                    .json(errorResponse);
-    }
-}
-
-async function getAllNotes(req, res) {
-    try {
-        const notes = await NoteService.getAllNotes();
-        successResponse.data = notes;
-        return res.status(StatusCodes.OK)
-                    .json(successResponse);
-    } catch (error) {
-        errorResponse.error = error;
-        return res.status(error.statusCode)
-                    .json(errorResponse);
-    }
-}
-
-async function getNote(req, res) {
-    try {
-        const note = await NoteService.getNote(req.params.id);
-        successResponse.data = note;
-        return res.status(StatusCodes.OK)
-                    .json(successResponse);
-    } catch (error) {
-        errorResponse.error = error;
-        return res.status(error.statusCode)
-                    .json(errorResponse);
-    }
-}
-
-async function getNoteByTitle(req, res) {
-    try {
-        const note = await NoteService.getNoteByTitle(req.params.title);
-        successResponse.data = note;
-        return res.status(StatusCodes.OK)
-                    .json(successResponse);
-    } catch (error) {
-        errorResponse.error = error;
-        return res.status(error.statusCode)
-                    .json(errorResponse);
-    }
-}
-
-async function updateNote(req, res) {
-    try {
-        const note = await NoteService.updateNote(req.params.id, req.body);
-        successResponse.data = note;
-        return res.status(StatusCodes.OK)
-                    .json(successResponse);
-    } catch (error) {
-        errorResponse.error = error;
-        return res.status(error.statusCode)
-                    .json(errorResponse);
-    }
-}
-
-async function deleteNote(req, res) {
-    try {
-        const note = await NoteService.deleteNote(req.params.id);
-        successResponse.data = note;
-        return res.status(StatusCodes.OK)
-                    .json(successResponse);
-    } catch (error) {
+        console.log(error);
         errorResponse.error = error;
         return res.status(error.statusCode)
                     .json(errorResponse);
@@ -81,10 +17,5 @@ async function deleteNote(req, res) {
 }
 
 module.exports = {
-    createNote,
-    getAllNotes,
-    getNote,
-    getNoteByTitle,
-    updateNote,
-    deleteNote
+    getRoadmap
 }

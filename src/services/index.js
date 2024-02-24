@@ -3,4 +3,5 @@ module.exports = {
     SubtopicService: require('./subtopic-service'),
     UserService: require('./user-service'),
     QuestionBankService: require('./questionbank-service'),
+    RoadmapService: require('./roadmap-service'),
 }

@@ -6,7 +6,12 @@ class RoadmapRepository extends CrudRepository {
         super(Roadmap);
     }
 
-    
+    async getRp(id) {
+        const rp = await Roadmap.findOne({
+            _id : id,
+        });
+        return rp;
+    }
 };
 
 module.exports = RoadmapRepository;
