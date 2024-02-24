@@ -18,7 +18,7 @@ async function createUser(data) {
       name : user.name,
       userId: user._id,
     });
-    return jwt;
+    return {jwt, user};
   } catch (error) {
     console.log(error);
     throw new AppError(
