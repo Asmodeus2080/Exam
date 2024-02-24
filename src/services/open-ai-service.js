@@ -1,87 +1,92 @@
-const AppError = require('../utils/errors/app-error');
-const  {GEMAI} = require('../config/server-config');
-const { StatusCodes } = require('http-status-codes');
+const AppError = require("../utils/errors/app-error");
+const { GEMAI } = require("../config/server-config");
+const { StatusCodes } = require("http-status-codes");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const genAI = new GoogleGenerativeAI(GEMAI);
-const model = genAI.getGenerativeModel({ model: "gemini-pro"});
+const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+const { RoadmapRepository } = require("../repositories");
+const { json } = require("express");
+const { TopicRepository, SubtopicRepository } = require("../repositories");
+const topicRepository = new TopicRepository();
+const subtopicRepository = new SubtopicRepository();
+const roadmapRepo = new RoadmapRepository();
 
-async function getRoadMap(topic, time, syllabus) {
-    try {
-        console.log(topic, syllabus, time);
-        const prompt = `give a roadmap on the topic ${topic} which includes these subtopics ${syllabus} that can be completed in total ${time} hours and give each day's hourly based roadmap. The roadmap should be structured and the output should be in json format, here is the example 
-        {
-            "topic": "Java Overloading",
-            "total_hours": 5,
-            "roadmap": [
-              {
-                "day": 1,
-                "schedule": [
-                  {
-                    "hour": 1,
-                    "topics": [
-                      "Java Methods (Basics)",
-                      "Introduction to Method Overloading",
-                      "Compiler and Overloading"
-                    ]
-                  },
-                  {
-                    "hour": 2,
-                    "topics": [
-                      "Overloading with Different Parameter Types",
-                      "Automatic Type Promotion",
-                      "Practice: Writing Overloaded Methods"
-                    ]
-                  }
-                ]
-              },
-              {
-                "day": 2,
-                "schedule": [
-                  {
-                    "hour": 1,
-                    "topics": [
-                      "Overloading with Different Number of Parameters",
-                      "Practice: Variation in Parameter Lists"
-                    ]
-                  },
-                  {
-                    "hour": 2,
-                    "topics": [
-                      "Constructor Overloading",
-                      "Overloading and Inheritance",
-                      "Practice: Inheritance Scenario"
-                    ]
-                  }
-                ]
-              },
-              {
-                "day": 3,
-                "schedule": [
-                  {
-                    "hour": 1,
-                    "topics": [
-                       "Review of Concepts", 
-                       "Practice Challenges", 
-                       "Ambiguities and Considerations (Optional)"
-                    ]
-                  }
-                ]
-              }
-            ]
-          }`;
-        // console.log(prompt);
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        // console.log(response);
-        const text = response.text();
-        console.log(text);
-        return text;
-        
-    } catch (error) {
-        throw new AppError("Something went wrong try again later", StatusCodes.INTERNAL_SERVER_ERROR);
-    }
-    
+async function getRoadMap(topic, time, syllabus, userId) {
+  try {
+    console.log(topic, syllabus, time);
+    const prompt = `give a roadmap on the topic ${topic} which includes these subtopics ${syllabus} that can be completed in total ${time} hours and give each topic's hourly based roadmap. The roadmap should be structured and the output should be in string format like this, here is the example 
+{"subtopics": [{"title": "Subtopic 1","hours": 2},{"title": "Subtopic 2","hours": 2},{"title": "Subtopic 3","hours": 1}]},  just return it in a string, don't include any other unnecessary symbols or text, directly give the string that's all, no explanations`;
+    // console.log(prompt);
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    // console.log(response);
+    const text = response.text();
+    console.log("text :", text);
+
+    // Parse the JSON data
+    const parsedData = JSON.parse(text);
+    // console.log(parsedData);
+    // Extract relevant information
+    const subtopics = parsedData.subtopics;
+
+    // Format into database-ready structure
+    const formattedData = {
+      subtopics: subtopics.map((subtopic) => ({
+        title: subtopic.title,
+        hours: subtopic.hours,
+      })),
+    };
+
+    // Create a new entry in the Roadmap model
+    const createdRoadmap = await roadmapRepo.create(formattedData);
+    console.log('id : ', createdRoadmap._id);
+    const tc = await topicRepository.makeTopic({
+      title: topic,
+      userId: userId,
+      roadmap: createdRoadmap._id,
+    });
+    // Return the roadmap ID
+    return createdRoadmap;
+  } catch (error) {
+    console.log(error);
+    throw new AppError(
+      "Something went wrong try again later",
+      StatusCodes.INTERNAL_SERVER_ERROR
+    );
+  }
+};
+
+async function getContent(title, duration, roadmap) {
+  try {
+    console.log(title, duration, roadmap);
+    const prompt = `create a concise content on the topic : ${title} curated for university exams. The content should be easily covered in ${duration} hours. The content should be structured and the output should be in string format like this, don't include unnecessary texts like, sure here is the content, directly give the content. '`
+
+    // console.log(prompt);
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    // console.log(response);
+    const text = response.text();
+    console.log("text :", text);
+
+    const con = subtopicRepository.create({
+      title: title,
+      duration: duration,
+      content: text,
+      roadmap: roadmap,
+    });
+
+    return text;
+
+  } catch (error) {
+    console.log(error);
+    throw new AppError(
+      "Something went wrong try again later",
+      StatusCodes.INTERNAL_SERVER_ERROR
+    );
+  }
 }
+
 module.exports = {
-    getRoadMap,
-}
+  getRoadMap,
+  getContent,
+};
