@@ -1,13 +1,13 @@
 const { StatusCodes } = require('http-status-codes');
 const { successResponse, errorResponse} = require('../utils/common');
-const {OpenAIService} = require('../services');
+const { OpenAIService, SubtopicService } = require('../services');
 
 
-async function createStudyMaterial(req, res) {
-    console.log(req.body);
+async function getContent(req, res) {
+    // console.log(req.body);
     try {
-        const {title, time, syllabus, userId} = req.body;
-        const data = await OpenAIService.getRoadMap(title, time, syllabus, userId);
+        const {title, duration, roadmap} = req.body;
+        const data = await OpenAIService.getContent(title, duration, roadmap);
         successResponse.data = data;
         return res.status(StatusCodes.CREATED)
                     .json(successResponse);
@@ -20,5 +20,5 @@ async function createStudyMaterial(req, res) {
 }
 
 module.exports = {
-    createStudyMaterial,
+    getContent,
 }

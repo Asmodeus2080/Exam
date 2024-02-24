@@ -6,9 +6,8 @@ const genAI = new GoogleGenerativeAI(GEMAI);
 const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 const { RoadmapRepository } = require("../repositories");
 const { json } = require("express");
-const { TopicRepository, SubtopicRepository } = require("../repositories");
+const { TopicRepository } = require("../repositories");
 const topicRepository = new TopicRepository();
-const subtopicRepository = new SubtopicRepository();
 const roadmapRepo = new RoadmapRepository();
 
 async function getRoadMap(topic, time, syllabus, userId) {
@@ -54,39 +53,7 @@ async function getRoadMap(topic, time, syllabus, userId) {
       StatusCodes.INTERNAL_SERVER_ERROR
     );
   }
-};
-
-async function getContent(title, duration, roadmap) {
-  try {
-    console.log(title, duration, roadmap);
-    const prompt = `create a concise content on the topic : ${title} curated for university exams. The content should be easily covered in ${duration} hours. The content should be structured and the output should be in string format like this, don't include unnecessary texts like, sure here is the content, directly give the content. '`
-
-    // console.log(prompt);
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    // console.log(response);
-    const text = response.text();
-    console.log("text :", text);
-
-    const con = subtopicRepository.create({
-      title: title,
-      duration: duration,
-      content: text,
-      roadmap: roadmap,
-    });
-
-    return text;
-
-  } catch (error) {
-    console.log(error);
-    throw new AppError(
-      "Something went wrong try again later",
-      StatusCodes.INTERNAL_SERVER_ERROR
-    );
-  }
 }
-
 module.exports = {
   getRoadMap,
-  getContent,
 };

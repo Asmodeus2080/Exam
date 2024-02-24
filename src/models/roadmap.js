@@ -1,22 +1,20 @@
 const mongoose = require('mongoose');
 
 const roadmapSchema = new mongoose.Schema({
-    days: [
+
+    subtopics: [
         {
-            day: {
-                type: Number,
+            title: {
+                type: String,
                 required: true,
             },
             hours: {
                 type: Number,
                 required: true,
             },
-            subtopics: [subtopicSchema],
-        },
+        }
     ],
     
-},
-    {timestamps: true}
-);
+});
 
 module.exports = mongoose.model('Roadmap', roadmapSchema);

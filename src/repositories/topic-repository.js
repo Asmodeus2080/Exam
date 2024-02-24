@@ -16,6 +16,14 @@ class TopicRepository extends CrudRepository {
             throw error;
         }
     }
+    async makeTopic(data) {
+        try {
+            const topic = await Topic.create(data);
+            return topic
+        } catch (error) {
+            throw error;
+        }
+    }
 };
 
 module.exports = TopicRepository;
