@@ -11,7 +11,9 @@ const roadmapSchema = new mongoose.Schema({
                 type: Number,
                 required: true,
             },
-            subtopics: [subtopicSchema],
+            subtopics: [{
+                type : String,
+            }],
         },
     ],
     

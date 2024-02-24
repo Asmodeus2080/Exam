@@ -4,11 +4,6 @@ const { UserService } = require('../services');
 
 const { successResponse, errorResponse } = require('../utils/common');
 
-
-/**
- * POST : /user/:id 
- * req-body {}
- */
 async function getUser(req, res) {
     try {
         const user = await UserService.getUser(req.params.id);
@@ -31,8 +26,8 @@ async function getUser(req, res) {
  */
 
 async function createUser(req, res) {    // signup
+    console.log(req.body);
     try {
-        // console.log('inside controller : ', req.body)
         const user = await UserService.createUser({
             email : req.body.email,
             password : req.body.password,

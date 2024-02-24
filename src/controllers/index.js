@@ -1,3 +1,4 @@
 module.exports = {
     StudyMaterialController : require('./StudyMaterial-controller'),
+    UserController : require('./user-controller')
 }
