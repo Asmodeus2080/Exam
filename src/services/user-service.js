@@ -46,7 +46,7 @@ async function signin(data) {
       email: user.email,
       userId: user._id,
     });
-    return jwt;
+    return {jwt, user};
   } catch (error) {
     if (error instanceof AppError) throw error;
     // console.log(error);

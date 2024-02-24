@@ -84,9 +84,23 @@ async function getContent(title, duration, roadmap) {
       StatusCodes.INTERNAL_SERVER_ERROR
     );
   }
+
+}
+
+async function getAllTopicByUserId(data) {
+    try {
+        const topics = topicRepository.getTopicsByUserId(data);
+        return topics;
+;    } catch (error) {
+        throw new AppError(
+            "Something went wrong try again later",
+            StatusCodes.INTERNAL_SERVER_ERROR
+        );
+    }
 }
 
 module.exports = {
   getRoadMap,
   getContent,
+  getAllTopicByUserId
 };

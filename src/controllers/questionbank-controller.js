@@ -24,7 +24,7 @@ async function createQuestionBank(req, res) {
 
 async function updateUpvote(req, res) {
     try {
-        console.log(req.body);
+        // console.log(req.body);
         const data = await QuestionBankService.upvoteAnswer(req.body);
         successResponse.data = data;
         return res
