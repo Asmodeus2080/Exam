@@ -10,8 +10,7 @@ const model = genAI.getGenerativeModel({ model: "gemini-pro"});
 
 async function getAnswer(question) {
     try {
-        const prompt = `can you answer this question ${question} only provide the answer donot write the question again and try to answer this question with appropriate examples if possible`;
-        // console.log(prompt);
+        const prompt = `Provide a concise answer to the question: ${question}. Share your response with relevant examples in plain English. Keep it between 30 to 50 words.`;
         const result = await model.generateContent(prompt);
         const response = await result.response;
         // console.log(response);
