@@ -16,7 +16,7 @@ class QuestionBank extends CrudRepository {
     async updateDownVote(data) {
         const upvote = await questionBank.findByIdAndUpdate(
             {_id : data.id},
-            {"$inc": {"downvote":-1}},
+            {"$inc": {"downvote":1}},
             {new: true}
         );
         return upvote;
