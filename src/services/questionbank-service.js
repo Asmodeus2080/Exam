@@ -28,6 +28,17 @@ async function getAnswer(question) {
     }
        
 }
+
+async function getQs(data) {
+    try {
+        const data = await questionBankRepository.getAll();
+        return data;
+    } catch (error) {
+        console.log(error);
+        throw new AppError("Something went wrong, while getting posts", StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+}
+
 async function upvoteAnswer(data) {
     try {
         const result = await questionBankRepository.updateUpvote(data);
@@ -46,8 +57,10 @@ async function downvote(data) {
        throw new AppError("Something went wrong, while updating downvote", StatusCodes.INTERNAL_SERVER_ERROR); 
     }
 }
+
 module.exports = {
     getAnswer,
     upvoteAnswer,
     downvote,
+    getQs,
 }

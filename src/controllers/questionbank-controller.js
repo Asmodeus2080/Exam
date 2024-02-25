@@ -22,6 +22,21 @@ async function createQuestionBank(req, res) {
     }
 }
 
+async function getQs(req, res) {
+    try {
+        const data = await QuestionBankService.getQs();
+        successResponse.data = data;
+        return res
+                .status(StatusCodes.CREATED)
+                .json(successResponse);
+    } catch (error) {
+        errorResponse.error = error;
+        return res
+                .status(error.statusCode)
+                .json(errorResponse);
+    }
+}
+
 async function updateUpvote(req, res) {
     try {
         // console.log(req.body);
@@ -60,5 +75,6 @@ async function updateDownVote(req, res) {
 module.exports = {
     createQuestionBank,
     updateUpvote,
-    updateDownVote
+    updateDownVote,
+    getQs,
 }
